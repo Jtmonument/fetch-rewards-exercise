@@ -9,3 +9,4 @@
     - Spring Data JPA
     - Project Lombok
     - H2 Database
+    - HATEOAS
