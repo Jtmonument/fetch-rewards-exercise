@@ -2,7 +2,6 @@ package com.fetchrewards.fetchrewardsexercise.model;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
