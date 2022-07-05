@@ -1,0 +1,26 @@
+entity Account {
+	id Long,
+    name String,
+    points Integer
+}
+
+entity Payer {
+	id Long,
+    name String,
+    points Integer
+}
+
+entity Transaction {
+	id Long,
+    points Integer,
+    timestamp String
+}
+
+relationship OneToMany {
+	Account to Payer,
+    Account to Transaction
+}
+
+relationship ManyToOne {
+	Transaction to Payer
+}
