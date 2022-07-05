@@ -1,5 +1,6 @@
 package com.fetchrewards.fetchrewardsexercise.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,5 +19,6 @@ public abstract class Payer extends BasicEntity {
 
     @NonNull
     @ManyToOne
+    @JsonIgnore
     protected Account account;
 }

@@ -9,7 +9,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@ToString(callSuper = true)
 @NoArgsConstructor
 @DiscriminatorValue("default")
 public class AccountImpl extends Account {

@@ -1,6 +1,7 @@
 package com.fetchrewards.fetchrewardsexercise.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
@@ -12,25 +13,25 @@ import java.util.Calendar;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
 @Setter
-@ToString(exclude = {"account", "timestamp"})
 @DiscriminatorColumn
 @RequiredArgsConstructor
 @NoArgsConstructor
 public abstract class Transaction extends BasicEntity {
     @NonNull
+    @JsonIgnore
     protected Calendar timestamp;
 
     @NonNull
     @ManyToOne
-    @JsonIgnoreProperties(value = {"account", "points"})
     protected Payer payer;
 
     @NonNull
     @ManyToOne
+    @JsonIgnore
     protected Account account;
 
-    @JsonAlias(value = "timestamp")
-    public String getTimestamp() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(timestamp.getTime());
+    @JsonAlias(value = "payer")
+    public String jsonPayer() {
+        return payer.name;
     }
 }
