@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface PayerRepository extends CrudRepository<Payer, Long> {
     Optional<Payer> findByNameAndAccount(String name, Account account);
 
-    List<Payer> findAllByAccount_Id(Long id);
+    List<Payer> findAllByAccount(Account account);
     @Modifying
     @Transactional
     @Query("Update Payer p set p.points=p.points+:points where p.name=:name and p.account=:account")
