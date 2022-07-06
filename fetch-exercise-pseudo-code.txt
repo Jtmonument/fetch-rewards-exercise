@@ -1,0 +1,111 @@
+Test Case #1
+------------
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 5000}" http://localhost:8080/api/1/spend/
+spend=5000, {D=1100, U=200, M=10000}
+i=0 (spend=5000 - D=300) -> spend=4700, points{D=0, U=0, M=0}, deduct{D=-300, U=0, M=0}
+i=1 (spend=4700 - U=200) -> spend=4500, points{D=0, U=0, M=0}, deduct{D=-300, U=-200, M=0}
+i=2 (spend=4500 - D=-200) -> spend=4700, points{D=0, U=0, M=0}, deduct{D=-100, U=-200, M=0}
+i=3 (spend=4700 - M=10000) -> spend=0, points{D=0, U=0, M=5300}, deduct{D=-100, U=-200, M=-4700}
+i=4 (spend=0 - D=1000) -> spend=0, points{D=1000, U=0, M=5300}, deduct{D=-100, U=-200, M=-4700}
+Correct
+
+spend=5000, {D=1100, U=200, M=10000}
+i=0 (spend=5000 - D=300) -> spend=4700, points{D=800, U=200, M=10000}, deduct{D=-300, U=0, M=0}
+i=1 (spend=4700 - U=200) -> spend=4500, points{D=800, U=0, M=10000}, deduct{D=-300, U=-200, M=0}
+i=2 (spend=4500 - D=-200) -> spend=4700, points{D=1000, U=0, M=10000}, deduct{D=-100, U=-200, M=0}
+i=3 (spend=4700 - M=10000) -> spend=0, points{D=1000, U=0, M=5300}, deduct{D=-100, U=-200, M=-4700}
+Correct also
+--------------------------------------------------------------------------------------------------
+Test Case #2
+------------
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 5000}" http://localhost:8080/api/1/spend/
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 3000}" http://localhost:8080/api/1/spend/
+spend=3000, {D=1000, U=0, M=5300}
+i=0 (spend=3000 - D=300) -> spend=2700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=1 (spend=2700 - U=200) -> spend=2500, points{D=700, U=0, M=5300}, deduct{D=-300, U=-200, M=0}
+i=2 (spend=2500 - D=-200) -> spend=2700, points{D=900, U=0, M=5300}, deduct{D=-100, U=-200, M=0}
+i=3 (spend=2700 - M=10000) -> spend=0, points{D=900, U=0, M=2600}, deduct{D=-100, U=-200, M=-2700}
+Could be correct(if U=-200 assigned to a different payer)
+
+spend=3000, {D=1000, U=0, M=5300}
+i=0 (spend=3000 - D=300) -> spend=2700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=1 (spend=2700 - U=200) -> spend=2700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=2 (spend=2900 - D=-200) -> spend=2900, points{D=900, U=0, M=5300}, deduct{D=-100, U=0, M=0}
+i=3 (spend=2900 - M=10000) -> spend=0, points{D=900, U=0, M=2400}, deduct{D=-100, U=0, M=-2900}
+
+Test Case #3
+------------
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 5000}" http://localhost:8080/api/1/spend/
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 5000}" http://localhost:8080/api/1/spend/
+spend=5000, {D=1000, U=0, M=5300}
+i=0 (spend=5000 - D=300) -> spend=4700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=1 (spend=4700 - U=200) -> spend=4500, points{D=700, U=0, M=5300}, deduct{D=-300, U=-200, M=0}
+i=2 (spend=4500 - D=-200) -> spend=4700, points{D=900, U=0, M=5300}, deduct{D=-100, U=-200, M=0}
+i=3 (spend=4700 - M=10000) -> spend=0, points{D=900, U=0, M=600}, deduct{D=-100, U=-200, M=-4700}
+Could be correct(if U=-200 assigned to a different payer)
+
+Test Case #4
+------------
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 5000}" http://localhost:8080/api/1/spend/
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 6000}" http://localhost:8080/api/1/spend/
+spend=6000, {D=1000, U=0, M=5300}
+i=0 (spend=6000 - D=300) -> spend=5700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=1 (spend=5700 - U=200) -> spend=5500, points{D=700, U=0, M=5300}, deduct{D=-300, U=-200, M=0}
+i=2 (spend=5500 - D=-200) -> spend=5700, points{D=900, U=0, M=5300}, deduct{D=-100, U=-200, M=0}
+i=3 (spend=5700 - M=10000) -> spend=0, points{D=900, U=0, M=0}, deduct{D=-100, U=-200, M=-5300}
+Could be correct(if last 400 with other 200 assigned to different payer)
+--------------------------------------------------------------------------------------------------
+spend=6000, {D=1000, U=0, M=5300}
+i=0 (spend=6000 - D=300) -> spend=5700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=1 (spend=5700 - U=200) -> spend=5700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=2 (spend=5700 - D=-200) -> spend=5900, points{D=900, U=0, M=5300}, deduct{D=-100, U=0, M=0}
+i=3 (spend=5900 - M=10000) -> spend=0, points{D=300, U=0, M=0}, deduct{D=-700, U=0, M=-5300}
+
+Test Case #5
+------------
+curl -X PUT -H "Content-Type: application/json" -d  "{\"points\": 1000}" http://localhost:8080/api/1/spend/
+spend=1000, {D=1100, U=200, M=10000}
+i=0 (spend=1000 - D=300) -> spend=700, points{D=800, U=200, M=10000}, deduct{D=-300, U=0, M=0}
+i=1 (spend=700 - U=200) -> spend=500, points{D=800, U=0, M=10000}, deduct{D=-300, U=-200, M=0}
+i=2 (spend=500 - D=-200) -> spend=700, points{D=1000, U=0, M=10000}, deduct{D=-100, U=-200, M=0}
+i=3 (spend=700 - M=10000) -> spend=0, points{D=1000, U=0, M=9300}, deduct{D=-100, U=-200, M=-700}
+Correct
+
+spend=6000, {D=1000, U=0, M=5300}
+i=0 (spend=6000 - D=300) -> spend=5700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=1 (spend=5700 - U=200) -> spend=5700, points{D=700, U=0, M=5300}, deduct{D=-300, U=0, M=0}
+i=2 (spend=5700 - D=-200) -> spend=5900, points{D=900, U=0, M=5300}, deduct{D=-100, U=0, M=0}
+i=3 (spend=5900 - M=10000) -> spend=0, points{D=900, U=0, M=0}, deduct{D=-100, U=0, M=-5300}
+i=0 (spend=600 - D=900) -> spend=0, points{D=300, U=0, M=0}, deduct{D=-700, U=0, M=-5300}
+Correct
+------------------------------------------------------------------------------------------------
+for transaction in transactions
+	if spend >= transaction.points
+		if payer.points - transaction.points >= 0
+			spend-=transaction.points
+			payer.points-= transaction.points
+			newTransactions[payer].points-=transaction.points
+		else
+			spend -= transaction.points + (payer.points - transaction.points)
+			newTransactions[payer].points-= transaction.points + (payer.points - transaction.points)
+			payer.points = transaction.points - payer.points
+	else
+		if payer.points - spend >= 0
+			newTransactions[payer].points-=spend
+			payer.points-=spend
+			spend = 0
+		else
+			spend-=payer.points
+			newTransactions[payer].points-=payer.points
+			payer.points-=payer.points
+		break
+if spend > 0
+	for payer in payers
+		if payer.points >= spend
+			payer.points -= spend
+			newTransactions[payer].points-=spend
+			spend = 0
+			break
+		else
+			payer.points = spend - payer.points
+			newTransactions[payer].points-=payer.points
