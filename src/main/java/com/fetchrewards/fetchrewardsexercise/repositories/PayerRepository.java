@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PayerRepository extends CrudRepository<Payer, Long> {
-    Optional<Payer> findByName(String name);
+    Optional<Payer> findByNameAndAccount(String name, Account account);
 
     List<Payer> findAllByAccount_Id(Long id);
     @Modifying
