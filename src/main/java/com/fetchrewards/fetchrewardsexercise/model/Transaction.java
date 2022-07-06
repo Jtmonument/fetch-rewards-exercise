@@ -18,6 +18,7 @@ import java.util.Calendar;
 @NoArgsConstructor
 public abstract class Transaction extends BasicEntity {
     @NonNull
+    @JsonIgnore
     protected Calendar timestamp;
 
     @NonNull
@@ -33,10 +34,5 @@ public abstract class Transaction extends BasicEntity {
     @JsonAlias(value = "payer")
     public String jsonPayer() {
         return payer.name;
-    }
-
-    @JsonAlias(value = "timestamp")
-    public String jsonTimestamp() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(timestamp.getTime());
     }
 }
