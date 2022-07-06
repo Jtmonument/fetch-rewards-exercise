@@ -1,6 +1,5 @@
 package com.fetchrewards.fetchrewardsexercise.repositories;
 
-import com.fetchrewards.fetchrewardsexercise.model.Account;
 import com.fetchrewards.fetchrewardsexercise.model.Transaction;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
