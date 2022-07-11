@@ -15,8 +15,6 @@ import com.fetchrewards.fetchrewardsexercise.services.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -50,8 +48,8 @@ public class FetchRewardsController {
                 linkTo(methodOn(FetchRewardsController.class).getAccount(id)).withSelfRel());
     }
 
-    @PostMapping(value = "/api/{id}/addTransaction/")
-    public ResponseEntity<String> addTransaction(@PathVariable Long id, @RequestBody String json) {
+    @PostMapping(value = "/api/{id}/transaction/")
+    public EntityModel<Transaction> addTransaction(@PathVariable Long id, @RequestBody String json) {
         Account account = accounts.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
         JsonNode parser;
         try {
@@ -79,11 +77,14 @@ public class FetchRewardsController {
             payers.save((payerEntity = new PayerImpl(payer, account)));
         }
 
-        transactions.save(service.addTransaction(payerEntity, points, timestamp));
+        Transaction transaction;
+
+        transactions.save(transaction = service.addTransaction(payerEntity, points, timestamp));
         payers.addPoints(account, payer, points);   // update points for payer
         accounts.addPoints(id, points); // update points for account
 
-        return new ResponseEntity<>(json, HttpStatus.OK);
+        return EntityModel.of(transaction,
+                linkTo(methodOn(FetchRewardsController.class).addTransaction(id, json)).withSelfRel());
     }
 
     @PutMapping(value = "/api/{id}/spend/")
