@@ -8,6 +8,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,17 +19,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AccountServiceImpl implements AccountService {
 
     @Override
-    public Transaction addTransaction(Payer payer, Integer points, String timestamp) {
-        Calendar time = new Calendar.Builder().setDate(
-                Integer.parseInt(timestamp.substring(0, 4)),
-                Integer.parseInt(timestamp.substring(5, 7)) - 1,
-                Integer.parseInt(timestamp.substring(8, 10))
-        ).setTimeOfDay(
-                Integer.parseInt(timestamp.substring(11, 13)),
-                Integer.parseInt(timestamp.substring(14, 16)),
-                Integer.parseInt(timestamp.substring(17, 19))
-        ).build();
-
+    public Transaction addTransaction(Payer payer, Integer points, Date timestamp) {
+        Calendar time = new Calendar.Builder().setInstant(timestamp).build();
         return new TransactionImpl(points, time, payer, payer.getAccount());
     }
 
