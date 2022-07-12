@@ -16,4 +16,8 @@ public class TransactionImpl extends Transaction {
         setPoints(points);
     }
 
+    public TransactionImpl(@NonNull Payer payer, @NonNull Account account) {
+        this.payer = payer;
+        this.account = account;
+    }
 }
