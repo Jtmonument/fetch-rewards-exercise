@@ -39,7 +39,7 @@ public class FetchRewardsController {
     private final ObjectMapper mapper;
 
     /*
-    * Return a JSON of account info, such as name, points, payers, and transactions
+    * Return a JSON of account info, such as name, points, payers, and transactions (for debugging purposes)
     * */
     @GetMapping(value = "/api/{id}/account/")
     public EntityModel<Account> getAccount(@PathVariable Long id) {
@@ -125,6 +125,17 @@ public class FetchRewardsController {
     public CollectionModel<Payer> checkBalance(@PathVariable Long id) {
         Account account = accounts.findById(id).orElseThrow(() -> new AccountNotFoundException(id));  //  handle 404 exception
         return service.checkBalance(id, payers.findAllByAccount(account));
+    }
+
+    /*
+    * Remove all transactions and payers from account (for unit testing purposes)
+    * */
+    @DeleteMapping(value = "/api/{id}/delete/")
+    public EntityModel<Account> deleteEverything(@PathVariable Long id) {
+        accounts.findById(id).orElseThrow(() -> new AccountNotFoundException(id)).setPoints(0);
+        accounts.deleteTransactions(id);
+        accounts.deletePayers(id);
+        return getAccount(id);
     }
 
     private <T> boolean validate(T obj) {
