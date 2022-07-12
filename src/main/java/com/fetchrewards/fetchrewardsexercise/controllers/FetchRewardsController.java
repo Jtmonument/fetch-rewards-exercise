@@ -52,14 +52,17 @@ public class FetchRewardsController {
     public EntityModel<Transaction> addTransaction(@PathVariable Long id, @RequestBody String json) {
         Account account = accounts.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
         JsonNode parser;
+        String payer;
+        Integer points;
+        String timestamp;
         try {
             parser = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+            payer = parser.get("payer").asText();
+            points = parser.get("points").asInt();
+            timestamp = parser.get("timestamp").asText();
+        } catch (JsonProcessingException | NullPointerException e) {
             throw new JsonParseException(json); //  handle bad json parse
         }
-        String payer = parser.get("payer").asText();
-        Integer points = parser.get("points").asInt();
-        String timestamp = parser.get("timestamp").asText();
 
         /* Validate JSON data */
         if (validate(payer)) {
@@ -91,12 +94,13 @@ public class FetchRewardsController {
     public CollectionModel<Transaction> spend(@PathVariable Long id, @RequestBody String json) {
         Account account = accounts.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
         JsonNode parser;
+        Integer points;
         try {
             parser = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+            points = parser.get("points").asInt();
+        } catch (JsonProcessingException | NullPointerException e) {
             throw new JsonParseException(json); //  handle bad json parse
         }
-        Integer points = parser.get("points").asInt();
 
         /* Validate JSON data */
         if (validate(points)) {
