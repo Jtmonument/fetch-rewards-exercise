@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -69,20 +72,17 @@ public class FetchRewardsController {
             throw new BadInputException("payer", payer);    //  handle if null, blank, or empty
         } else if (validate(points)) {
             throw new BadInputException("points", points);  //  handle if null or zero
-        } else if (validate(timestamp) || validateTimestamp(timestamp)) {
+        } else if (validate(timestamp)) {
             throw new BadTimestampFormatException(timestamp);   //  handle if null, blank, empty, or of bad format
         }
+        Date time = validateTimestamp(timestamp);
 
-        Payer payerEntity = payers.findByNameAndAccount(payer, account).orElse(null);
-
-        /* If this payer is not known, add this payer */
-        if (payerEntity == null) {
-            payers.save((payerEntity = new PayerImpl(payer, account)));
+        Payer payerEntity = payers.findByNameAndAccount(payer, account).orElse(new PayerImpl(payer, account));
+        if (payerEntity.getId() == null) {
+            payers.save(payerEntity);
         }
 
-        Transaction transaction;
-
-        transactions.save(transaction = service.addTransaction(payerEntity, points, timestamp));
+        Transaction transaction = transactions.save(service.addTransaction(payerEntity, points, time));
         payers.addPoints(account, payer, points);   // update points for payer
         accounts.addPoints(id, points); // update points for account
 
@@ -144,12 +144,17 @@ public class FetchRewardsController {
                 || ((obj instanceof Integer) && ((Integer) obj == 0))));
     }
 
-    private boolean validateTimestamp(String timestamp) {
+    private Date validateTimestamp(String timestamp) {
         try {
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(timestamp);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date time = formatter.parse(timestamp);
+            if (time.after(Date.from(Instant.now()))) {
+                throw new BadTimestampFormatException(timestamp);
+            }
+            return time;
         } catch (ParseException e) {
-            return true;
+            throw new BadTimestampFormatException(timestamp);
         }
-        return false;
     }
 }
