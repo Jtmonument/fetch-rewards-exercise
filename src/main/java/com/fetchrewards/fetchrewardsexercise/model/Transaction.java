@@ -15,7 +15,7 @@ import java.util.Calendar;
 @NoArgsConstructor
 public abstract class Transaction extends BasicEntity {
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     protected Calendar timestamp;
 
     @NonNull

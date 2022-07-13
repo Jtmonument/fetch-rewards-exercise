@@ -8,6 +8,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,17 +19,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AccountServiceImpl implements AccountService {
 
     @Override
-    public Transaction addTransaction(Payer payer, Integer points, String timestamp) {
-        Calendar time = new Calendar.Builder().setDate(
-                Integer.parseInt(timestamp.substring(0, 4)),
-                Integer.parseInt(timestamp.substring(5, 7)) - 1,
-                Integer.parseInt(timestamp.substring(8, 10))
-        ).setTimeOfDay(
-                Integer.parseInt(timestamp.substring(11, 13)),
-                Integer.parseInt(timestamp.substring(14, 16)),
-                Integer.parseInt(timestamp.substring(17, 19))
-        ).build();
-
+    public Transaction addTransaction(Payer payer, Integer points, Date timestamp) {
+        Calendar time = new Calendar.Builder().setInstant(timestamp).build();
         return new TransactionImpl(points, time, payer, payer.getAccount());
     }
 
@@ -45,7 +37,7 @@ public class AccountServiceImpl implements AccountService {
             Payer payer = transaction.getPayer();
 
             /* Reduce time complexity by adding new transactions as they are necessary */
-            Transaction newTransaction = newTransactions.getOrDefault(payer, new TransactionImpl());
+            Transaction newTransaction = newTransactions.getOrDefault(payer, new TransactionImpl(payer, payer.getAccount()));
             if (spend >= transaction.getPoints()) {
                 if (payer.getPoints() - transaction.getPoints() >= 0) {
                     spend -= transaction.getPoints();
@@ -86,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
             for (Payer payer : payers) {
 
                 /* In case payers are still not in hashmap */
-                Transaction newTransaction = newTransactions.getOrDefault(payer, new TransactionImpl());
+                Transaction newTransaction = newTransactions.getOrDefault(payer, new TransactionImpl(payer, payer.getAccount()));
 
                 /* Prevent error with transactions of zero points from adding to payer's points */
                 if (payer.getPoints() == 0) {
@@ -108,8 +100,6 @@ public class AccountServiceImpl implements AccountService {
         /* Remove any remaining transactions of zero points and add necessary data */
         return newTransactions.values().stream().filter(transaction -> {
             transaction.setTimestamp(Calendar.getInstance());
-            transaction.setPayer(transaction.getPayer());
-            transaction.setAccount(transaction.getAccount());
             return transaction.getPoints() != 0;    // return lambda
         }).toList();
     }
