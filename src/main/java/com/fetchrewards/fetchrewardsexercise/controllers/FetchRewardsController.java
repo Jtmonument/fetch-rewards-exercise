@@ -103,7 +103,7 @@ public class FetchRewardsController {
         }
 
         /* Validate JSON data */
-        if (validate(points)) {
+        if (validate(points) || points < 0) {
             throw new BadInputException("points", points);  //  handle if zero or null
         }
 
@@ -139,9 +139,9 @@ public class FetchRewardsController {
     }
 
     private <T> boolean validate(T obj) {
-        return ((obj == null)
-                || ((obj instanceof String) && ((((String) obj).isBlank()) || (((String) obj).isEmpty()))
-                || ((obj instanceof Integer) && ((Integer) obj == 0))));
+        return ((obj instanceof String) && ((((String) obj).isBlank()) || (((String) obj).isEmpty())
+                || (obj.equals("null")))
+                || ((obj instanceof Integer) && ((Integer) obj == 0)));
     }
 
     private Date validateTimestamp(String timestamp) {
